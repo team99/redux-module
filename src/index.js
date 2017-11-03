@@ -25,20 +25,27 @@ export function getEffectsFromModules(modules) {
 
 function reduxModule(opts = {}) {
   return {
-      reducer: (state = opts.initialState || {}, payload) => {
-        if (opts.reducers[payload.type]) {
-          return opts.reducers[payload.type](state, payload);
-        } else {
-          return state;
-        }
-      },
-      actions: Object.keys(opts.reducers).reduce((result, key) => {
-        result[key] = key;
-        return result;
-      }, {}),
-      actionCreators: opts.actionCreators || {},
-      effects: opts.effects || {},
-  }
+    reducer: (state, payload) => {
+      let newState;
+      if (state) {
+        newState = state;
+      } else {
+        newState = JSON.parse(JSON.stringify(opts.initialState)) || {};
+      }
+
+      if (opts.reducers[payload.type]) {
+        return opts.reducers[payload.type](newState, payload);
+      } else {
+        return newState;
+      }
+    },
+    actions: Object.keys(opts.reducers).reduce((result, key) => {
+      result[key] = key;
+      return result;
+    }, {}),
+    actionCreators: opts.actionCreators || {},
+    effects: opts.effects || {},
+  };
 };
 
 export default reduxModule;
